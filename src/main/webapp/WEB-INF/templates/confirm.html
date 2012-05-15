@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+<title>Please confirm reservation</title>
+</head>
+<body>
+
+	<p>Next Reservation available: 
+		<span th:text="${#dates.format(appointment.timestamp,'dd MMMM yyyy HH:mm')}">13 February 2011 10:15</span>
+	</p>
+
+	Please confirm.
+	<form action="#" th:action="@{/confirm}" method="post">
+		<input name="appointmentId" type="hidden" value="" th:value="${appointment.id}" />
+		<input type="submit" />
+	</form>
+
+</body>
+</html>
