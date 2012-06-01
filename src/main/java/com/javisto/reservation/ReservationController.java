@@ -21,8 +21,7 @@ public class ReservationController
     @RequestMapping("/next")
     public ModelAndView next(Principal principal)
     {
-        // TODO use principal.getName()
-        Appointment nextAppointment = dao.reserveNextAppointment("bart@gmail.com");
+        Appointment nextAppointment = dao.reserveNextAppointment(principal.getName());
         String viewname = nextAppointment == ReservationDAO.BLANK_APPOINTMENT ? "sorry" : "confirm";
         ModelAndView modelAndView = new ModelAndView(viewname);
         modelAndView.addObject("appointment", nextAppointment);

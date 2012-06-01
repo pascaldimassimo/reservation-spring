@@ -1,71 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:task="http://www.springframework.org/schema/task"
-       xsi:schemaLocation="http://www.springframework.org/schema/mvc
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc
                            http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
                            http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                            http://www.springframework.org/schema/context
                            http://www.springframework.org/schema/context/spring-context-3.1.xsd
                            http://www.springframework.org/schema/task
-                           http://www.springframework.org/schema/task/spring-task-3.1.xsd">
-    
-    
-  <!-- **************************************************************** -->
-  <!--  RESOURCE FOLDERS CONFIGURATION                                  -->
-  <!--  Dispatcher configuration for serving static resources           -->
-  <!-- **************************************************************** -->
-  <mvc:resources location="/images/" mapping="/images/**" />
-  <mvc:resources location="/css/" mapping="/css/**" />
-    
-
-  <!-- **************************************************************** -->
-  <!--  SPRING ANNOTATION PROCESSING                                    -->
-  <!-- **************************************************************** -->
-  <mvc:annotation-driven />
-  <context:component-scan base-package="com.javisto.reservation" />
+                           http://www.springframework.org/schema/task/spring-task-3.1.xsd
+                           http://www.springframework.org/schema/security
+          				   http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
 
-  <!-- **************************************************************** -->
-  <!--  MESSAGE EXTERNALIZATION/INTERNATIONALIZATION                    -->
-  <!--  Standard Spring MessageSource implementation                    -->
-  <!-- **************************************************************** -->
-  <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-    <property name="basename" value="Messages" />
-  </bean>
+	<!-- **************************************************************** -->
+	<!-- RESOURCE FOLDERS CONFIGURATION -->
+	<!-- Dispatcher configuration for serving static resources -->
+	<!-- **************************************************************** -->
+	<mvc:resources location="/images/" mapping="/images/**" />
+	<mvc:resources location="/css/" mapping="/css/**" />
 
 
-  <!-- **************************************************************** -->
-  <!--  THYMELEAF-SPECIFIC ARTIFACTS                                    -->
-  <!--  TemplateResolver <- TemplateEngine <- ViewResolver              -->
-  <!-- **************************************************************** -->
+	<!-- **************************************************************** -->
+	<!-- SPRING ANNOTATION PROCESSING -->
+	<!-- **************************************************************** -->
+	<mvc:annotation-driven />
+	<context:component-scan base-package="com.javisto.reservation" />
 
-  <bean id="templateResolver"
-        class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">
-    <property name="prefix" value="/WEB-INF/templates/" />
-    <property name="suffix" value=".html" />
-    <property name="templateMode" value="HTML5" />
-    <!-- DEBUG ONLY -->
-    <property name="cacheable" value="false" />
-  </bean>
-    
-  <bean id="templateEngine"
-        class="org.thymeleaf.spring3.SpringTemplateEngine">
-    <property name="templateResolver" ref="templateResolver" />
-  </bean>
-   
-  <bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
-    <property name="templateEngine" ref="templateEngine" />
-  </bean>    
-  
-  <!-- **************************************************************** -->
-  <!--  App specific                                                    -->
-  <!-- **************************************************************** -->
-   
-  <!-- TODO use jdbc.properties as described in Spring Ref 13.2.1.2 -->
+
+	<!-- **************************************************************** -->
+	<!-- MESSAGE EXTERNALIZATION/INTERNATIONALIZATION -->
+	<!-- Standard Spring MessageSource implementation -->
+	<!-- **************************************************************** -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="Messages" />
+	</bean>
+
+
+	<!-- **************************************************************** -->
+	<!-- THYMELEAF-SPECIFIC ARTIFACTS -->
+	<!-- TemplateResolver <- TemplateEngine <- ViewResolver -->
+	<!-- **************************************************************** -->
+
+	<bean id="templateResolver"
+		class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">
+		<property name="prefix" value="/WEB-INF/templates/" />
+		<property name="suffix" value=".html" />
+		<property name="templateMode" value="HTML5" />
+		<!-- DEBUG ONLY -->
+		<property name="cacheable" value="false" />
+	</bean>
+
+	<bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+		<property name="templateResolver" ref="templateResolver" />
+	</bean>
+
+	<bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
+		<property name="templateEngine" ref="templateEngine" />
+	</bean>
+
+	<!-- **************************************************************** -->
+	<!-- Security -->
+	<!-- **************************************************************** -->
+
+	<security:http auto-config="true">
+		<security:intercept-url pattern="/*" access="ROLE_PATIENT" />
+	</security:http>
+	<security:authentication-manager alias="authenticationManager">
+		<security:authentication-provider>
+			<security:jdbc-user-service
+				data-source-ref="dataSource"
+				users-by-username-query="select email,password,enabled from users 
+										 where email=?"
+				authorities-by-username-query="select u.email, r.name from users u
+											   join user_role ur on (u.id = ur.user_id)
+											   join role r on (ur.role_id = r.id)
+		      								   where u.email=?" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+	<!-- **************************************************************** -->
+	<!-- App specific -->
+	<!-- **************************************************************** -->
+
+	<!-- TODO use jdbc.properties as described in Spring Ref 13.2.1.2 -->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="org.postgresql.Driver" />
@@ -73,10 +94,10 @@
 		<property name="username" value="pascal" />
 		<property name="password" value="" />
 	</bean>
-	
+
 	<!-- Single-thread executor for scheduled services -->
 	<task:annotation-driven />
-    
+
 </beans>
 
 

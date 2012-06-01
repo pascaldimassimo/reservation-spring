@@ -19,7 +19,7 @@ public class ReservationDaoImpl extends NamedParameterJdbcTemplate implements Re
     private static final String QUERY_USER_ID              = "SELECT id FROM users WHERE email=?";
 
     private static final String UPDATE_INSERT_RESERVATION  = String
-                                                               .format("INSERT INTO reservation(appointment_id, users_id, confirmed) VALUES(?, (%s), false)",
+                                                               .format("INSERT INTO reservation(appointment_id, user_id, confirmed) VALUES(?, (%s), false)",
                                                                        QUERY_USER_ID);
 
     private static final String UPDATE_CONFIRM_RESERVATION = "UPDATE reservation SET confirmed=true WHERE appointment_id=?";

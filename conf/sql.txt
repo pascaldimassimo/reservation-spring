@@ -1,0 +1,37 @@
+drop table reservation;
+drop table user_role;
+drop table role;
+drop table users;
+drop table appointment;
+drop table doctor;
+
+CREATE TABLE doctor(id SERIAL PRIMARY KEY, first_name VARCHAR(50), last_name VARCHAR(50));
+CREATE TABLE appointment(id SERIAL PRIMARY KEY, time TIMESTAMP, doctor_id INTEGER references doctor(id));
+CREATE TABLE users(id SERIAL PRIMARY KEY, email VARCHAR(100), password VARCHAR(50), first_name VARCHAR(50), last_name VARCHAR(50), enabled BOOLEAN, UNIQUE(email));
+CREATE TABLE role(id SERIAL PRIMARY KEY, name VARCHAR(45), UNIQUE(name));
+CREATE TABLE user_role(user_id INTEGER references users(id), role_id INTEGER references role(id), PRIMARY KEY(user_id, role_id));
+CREATE TABLE reservation(id SERIAL PRIMARY KEY, appointment_id INTEGER references appointment(id), user_id INTEGER references users(id), confirmed BOOLEAN, UNIQUE (appointment_id));
+
+INSERT INTO doctor(first_name, last_name) values('mad', 'doctor');
+INSERT INTO doctor(first_name, last_name) values('julius', 'hibbert');
+
+INSERT into appointment(doctor_id, time) values(1, '2012-03-21 08:00');
+INSERT into appointment(doctor_id, time) values(2, '2012-03-21 08:00');
+INSERT into appointment(doctor_id, time) values(1, '2012-03-21 08:15');
+INSERT into appointment(doctor_id, time) values(2, '2012-03-21 08:15');
+INSERT into appointment(doctor_id, time) values(1, '2012-03-21 08:30');
+INSERT into appointment(doctor_id, time) values(2, '2012-03-21 08:30');
+
+INSERT INTO users(email, password, first_name, last_name, enabled) values('bart@gmail.com', 'bart', 'bart', 'simpsons', true);
+INSERT INTO users(email, password, first_name, last_name, enabled) values('lisa@gmail.com', 'lisa', 'lisa', 'simpsons', true);
+INSERT INTO users(email, password, first_name, last_name, enabled) values('homer@gmail.com', MD5('homer'), 'homer', 'simpsons', true);
+
+INSERT INTO role(name) values('ROLE_PATIENT');
+
+insert into user_role(user_id, role_id) values(1, 1);
+insert into user_role(user_id, role_id) values(2, 1);
+insert into user_role(user_id, role_id) values(3, 1);
+
+INSERT INTO reservation(appointment_id, user_id, confirmed) VALUES(1, 1, false);
+INSERT INTO reservation(appointment_id, user_id, confirmed) VALUES(2, 2, false);
+
